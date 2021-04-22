@@ -43,7 +43,7 @@ _sorted_coarse_name_to_coarse_index = \
 # full loop is run, any results from yield are collected - can return multiple
 # but name only exists once in d
 def _find_parent(name, d):
-  for k, v in d.iteritems():
+  for k, v in d.items():
     if isinstance(v, list):
       if name in v:
         yield k
@@ -54,10 +54,10 @@ def _find_parent(name, d):
 
 
 def generate_fine_to_coarse(out_path):
-  print("generating fine to coarse files in %s ..." % out_path)
+  print(("generating fine to coarse files in %s ..." % out_path))
   # -1 (unlabelled) is not in dict, not used (see _CocoStuff._fine_to_coarse)
 
-  print(os.getcwd())
+  print((os.getcwd()))
 
   with open("./code/datasets/segmentation/util/cocostuff_fine_raw.txt") as f:
     l = [tuple(pair.rstrip().split('\t')) for pair in f]
@@ -83,7 +83,7 @@ def generate_fine_to_coarse(out_path):
   assert (len(fine_index_to_coarse_index) == 182)
 
   # write fine_index_to_coarse_index, fine_name_to_coarse_name
-  print("dumping to: %s" % out_path)
+  print(("dumping to: %s" % out_path))
   with open(out_path, "wb") as out_f:
     pickle.dump({"fine_index_to_coarse_index": fine_index_to_coarse_index,
                  "fine_name_to_coarse_name": fine_name_to_coarse_name},
@@ -91,9 +91,9 @@ def generate_fine_to_coarse(out_path):
 
   with open(out_path + ".txt", "w") as out_f:
     print("fine_name_to_coarse_name:")
-    for k, v in fine_name_to_coarse_name.iteritems():
+    for k, v in fine_name_to_coarse_name.items():
       out_f.write("%s\t%s" % (k, v))
 
     print("fine_index_to_coarse_index:")
-    for k, v in fine_index_to_coarse_index.iteritems():
+    for k, v in fine_index_to_coarse_index.items():
       out_f.write("%d\t%d" % (k, v))

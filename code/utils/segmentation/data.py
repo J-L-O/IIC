@@ -88,9 +88,9 @@ def _create_dataloaders(config, dataset_class):
   # need the matrix relation between them
   dataloaders = []
   do_shuffle = (config.num_dataloaders == 1)
-  for d_i in xrange(config.num_dataloaders):
-    print("Creating paired dataloader %d out of %d time %s" %
-          (d_i, config.num_dataloaders, datetime.now()))
+  for d_i in range(config.num_dataloaders):
+    print(("Creating paired dataloader %d out of %d time %s" %
+          (d_i, config.num_dataloaders, datetime.now())))
     sys.stdout.flush()
 
     train_imgs_list = []
@@ -119,8 +119,8 @@ def _create_dataloaders(config, dataset_class):
     dataloaders.append(train_dataloader)
 
   num_train_batches = len(dataloaders[0])
-  print("Length of paired datasets vector %d" % len(dataloaders))
-  print("Number of batches per epoch: %d" % num_train_batches)
+  print(("Length of paired datasets vector %d" % len(dataloaders)))
+  print(("Number of batches per epoch: %d" % num_train_batches))
   sys.stdout.flush()
 
   return dataloaders

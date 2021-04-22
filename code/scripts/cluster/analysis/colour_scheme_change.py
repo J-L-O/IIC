@@ -71,7 +71,7 @@ if not os.path.exists(out_dir):
 for i in args.file_indices:
   fname = args.file_pattern % i
   fpath = os.path.join(args.in_dir, fname)
-  print("fpath: %s..." % fpath)
+  print(("fpath: %s..." % fpath))
   img = np.array(Image.open(fpath))
 
   for c, curr_colours in enumerate(scheme):
@@ -81,13 +81,13 @@ for i in args.file_indices:
     new_img.save(os.path.join(out_dir, "c_%d_%s" % (c, fname)))
 
 # make composites
-for c in xrange(len(scheme)):
+for c in range(len(scheme)):
   fnames = [args.file_pattern % i for i in args.file_indices]
   fnames = ["c_%d_%s" % (c, fname) for fname in fnames]
   fnames = [os.path.join(out_dir, fname) for fname in fnames]
 
-  images = map(Image.open, fnames)
-  widths, heights = zip(*(i.size for i in images))
+  images = list(map(Image.open, fnames))
+  widths, heights = list(zip(*(i.size for i in images)))
 
   total_width = sum(widths)
   max_height = max(heights)

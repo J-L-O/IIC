@@ -24,7 +24,7 @@ _class_thresh = 0.75
 _size_thresh = 360
 _version = 7
 
-_datasets_to_coarse = {"Coco164kFull_Stuff_Coarse": range(12, 27),
+_datasets_to_coarse = {"Coco164kFull_Stuff_Coarse": list(range(12, 27)),
                        "Coco164kFew_Stuff": [23, 22, 21],
                        "Coco164kFew_Stuff_People": [23, 22, 21, 9],
                        "Coco164kFew_Stuff_People_Animals": [23, 22, 21, 9, 7],
@@ -51,7 +51,7 @@ def main():
     for split in ["train2017", "val2017"]:
       output_path = osp.join(_dataset_root, "curated", split,
                              "%s_%d.txt" % (dataset, _version))
-      print("doing %s" % output_path)
+      print(("doing %s" % output_path))
       sysstd.flush()
 
       # unvetted 164k - no orig list, just image dump, per split
@@ -59,21 +59,21 @@ def main():
         glob(osp.join(_dataset_root, "annotations", split, "*.png")))
 
       fine_list = fine_from_coarse(_datasets_to_coarse[dataset])
-      print("using fine inds list: %s" % fine_list)
+      print(("using fine inds list: %s" % fine_list))
 
       curated_handles = []
       for img_i, gt_path in enumerate(file_list_gt):
         handle = osp.basename(gt_path).replace(".png", "")
         if img_i % 2000 == 0:
-          print("on %d of %d, handle %s, accepted so far %d, %s" %
+          print(("on %d of %d, handle %s, accepted so far %d, %s" %
                 (img_i, len(file_list_gt), handle, len(curated_handles),
-                 datetime.now()))
+                 datetime.now())))
           sysstd.flush()
 
         if meets_conditions(gt_path, fine_list, _class_thresh, _size_thresh):
           curated_handles.append(handle)
 
-      print("...num_imgs: %d" % len(curated_handles))
+      print(("...num_imgs: %d" % len(curated_handles)))
       sysstd.flush()
 
       with open(output_path, "w+") as outf:
@@ -104,7 +104,7 @@ def fine_from_coarse(coarse_list):
 
   # 182 class inds, [0, 181] canonical fine indexing
   # (255 means unlabelled in 164k)
-  for fine in xrange(182):
+  for fine in range(182):
     coarse = _fine_to_coarse_dict[fine]
     if coarse in coarse_list:
       fine_list.append(fine)

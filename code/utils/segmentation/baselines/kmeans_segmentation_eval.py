@@ -38,7 +38,7 @@ def train_kmeans(config, net, test_dataloader):
   # discard the label information in the dataloader
   for i, tup in enumerate(test_dataloader):
     if (config.verbose and i < 10) or (i % int(len(test_dataloader) / 10) == 0):
-      print("(kmeans_segmentation_eval) batch %d time %s" % (i, datetime.now()))
+      print(("(kmeans_segmentation_eval) batch %d time %s" % (i, datetime.now())))
       sysout.flush()
 
     imgs, _, mask = tup  # test dataloader, cpu tensors
@@ -56,8 +56,8 @@ def train_kmeans(config, net, test_dataloader):
       x_out = net(imgs, penultimate=True).cpu().numpy()
 
     if config.verbose and i < 2:
-      print("(kmeans_segmentation_eval) through model %d time %s" % (i,
-                                                                     datetime.now()))
+      print(("(kmeans_segmentation_eval) through model %d time %s" % (i,
+                                                                     datetime.now())))
       sysout.flush()
 
     num_imgs_batch = x_out.shape[0]
@@ -66,8 +66,8 @@ def train_kmeans(config, net, test_dataloader):
     x_out = x_out[mask, :]
 
     if config.verbose and i < 2:
-      print("(kmeans_segmentation_eval) applied mask %d time %s" % (i,
-                                                                    datetime.now()))
+      print(("(kmeans_segmentation_eval) applied mask %d time %s" % (i,
+                                                                    datetime.now())))
       sysout.flush()
 
     if i == 0:
@@ -81,8 +81,8 @@ def train_kmeans(config, net, test_dataloader):
     x_out = x_out[selected, :]
 
     if config.verbose and i < 2:
-      print("(kmeans_segmentation_eval) applied select %d time %s" % (i,
-                                                                      datetime.now()))
+      print(("(kmeans_segmentation_eval) applied select %d time %s" % (i,
+                                                                      datetime.now())))
       sysout.flush()
 
     features_all[actual_num_features:actual_num_features + num_selected, :] = \
@@ -91,8 +91,8 @@ def train_kmeans(config, net, test_dataloader):
     actual_num_features += num_selected
 
     if config.verbose and i < 2:
-      print("(kmeans_segmentation_eval) stored %d time %s" % (i,
-                                                              datetime.now()))
+      print(("(kmeans_segmentation_eval) stored %d time %s" % (i,
+                                                              datetime.now())))
       sysout.flush()
 
   assert (actual_num_features <= config.max_num_kmeans_samples)
@@ -123,7 +123,7 @@ def apply_trained_kmeans(config, net, test_dataloader, kmeans):
   # discard the label information in the dataloader
   for i, tup in enumerate(test_dataloader):
     if (config.verbose and i < 10) or (i % int(len(test_dataloader) / 10) == 0):
-      print("(apply_trained_kmeans) batch %d time %s" % (i, datetime.now()))
+      print(("(apply_trained_kmeans) batch %d time %s" % (i, datetime.now())))
       sysout.flush()
 
     imgs, targets, mask = tup  # test dataloader, cpu tensors
@@ -181,7 +181,7 @@ def apply_trained_kmeans(config, net, test_dataloader, kmeans):
     nmi, ari = -1., -1.
 
   reordered_masses = np.zeros(config.gt_k)
-  for c in xrange(config.gt_k):
+  for c in range(config.gt_k):
     reordered_masses[c] = float(
       (reordered_preds == c).sum()) / actual_num_unmasked
 

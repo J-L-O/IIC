@@ -12,7 +12,7 @@ def get_opt(name):
 def config_to_str(config):
   attrs = vars(config)
   string_val = "Config: -----\n"
-  string_val += "\n".join("%s: %s" % item for item in attrs.items())
+  string_val += "\n".join("%s: %s" % item for item in list(attrs.items()))
   string_val += "\n----------"
   return string_val
 
@@ -33,9 +33,9 @@ def reorder_train_deterministic(dataset):
 
   # 0, 5000...5019, 1, 5020...5039, 2, ... 4999, 104980 ... 104999
   ids = []
-  for i in xrange(5000):
+  for i in range(5000):
     ids.append(i)
-    ids += range(5000 + i * 20, 5000 + (i + 1) * 20)
+    ids += list(range(5000 + i * 20, 5000 + (i + 1) * 20))
 
   dataset.data = dataset.data[ids]
   assert (dataset.data.shape == (105000, 3, 96, 96))
@@ -48,14 +48,14 @@ def reorder_train_deterministic(dataset):
 def print_weights_and_grad(net):
   print("---------------")
   for n, p in net.named_parameters():
-    print("%s abs: min %f max %f max grad %f" %
+    print(("%s abs: min %f max %f max grad %f" %
           (n, torch.abs(p.data).min(), torch.abs(p.data).max(), \
-           torch.abs(p.grad).max()))
+           torch.abs(p.grad).max())))
   print("---------------")
 
 
 def nice(dict):
   res = ""
-  for k, v in dict.iteritems():
+  for k, v in dict.items():
     res += ("\t%s: %s\n" % (k, v))
   return res

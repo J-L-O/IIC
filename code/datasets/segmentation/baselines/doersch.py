@@ -39,8 +39,8 @@ class DoerschDataset(data.Dataset):
         stats = pickle.load(f)
         self.stddev = stats["stddev"]
         self.mean = stats["mean"]
-      print("created Doersch dataset wrapping %s, stddev %s" % (config.dataset,
-                                                                self.stddev))
+      print(("created Doersch dataset wrapping %s, stddev %s" % (config.dataset,
+                                                                self.stddev)))
       sysout.flush()
 
   def __getitem__(self, index):
@@ -67,7 +67,7 @@ class DoerschDataset(data.Dataset):
       #                         size=(2, self.input_sz, self.input_sz))
       # noise = torch.from_numpy(noise)
 
-      for c in xrange(2):
+      for c in range(2):
         img[channel_pair[c], :, :] = noise[c, :, :]
 
       return (img,) + tup[1:]
@@ -84,9 +84,9 @@ class DoerschDataset(data.Dataset):
     pixels = np.zeros((num_imgs * self.input_sz * self.input_sz, 3),
                       dtype=np.float32)
     count = 0
-    for i in xrange(num_imgs):
+    for i in range(num_imgs):
       if i % (num_imgs / 10) == 0:
-        print("img %d out of %d" % (i, num_imgs))
+        print(("img %d out of %d" % (i, num_imgs)))
         sysout.flush()
 
       tup = self.base_dataset[i]
@@ -113,6 +113,6 @@ class DoerschDataset(data.Dataset):
     stddev = np.std(pixels, axis=0)
     mean = np.mean(pixels, axis=0)
 
-    print("got rgb mean %s and std %s" % (stddev, mean))
+    print(("got rgb mean %s and std %s" % (stddev, mean)))
     with open(self.stddev_fname, "wb") as outfile:
       pickle.dump({"stddev": stddev, "mean": mean}, outfile)

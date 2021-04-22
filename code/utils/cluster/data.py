@@ -74,7 +74,7 @@ def cluster_twohead_create_dataloaders(config):
   else:
     assert (False)
 
-  print("Making datasets with %s and %s" % (dataset_class, target_transform))
+  print(("Making datasets with %s and %s" % (dataset_class, target_transform)))
   sys.stdout.flush()
 
   dataloaders_head_A = \
@@ -150,7 +150,7 @@ def cluster_create_dataloaders(config):
   else:
     assert (False)
 
-  print("Making datasets with %s and %s" % (dataset_class, target_transform))
+  print(("Making datasets with %s and %s" % (dataset_class, target_transform)))
   sys.stdout.flush()
 
   dataloaders = \
@@ -292,9 +292,9 @@ def _create_dataloaders(config, dataset_class, tf1, tf2,
                        torch.utils.data.sampler.SequentialSampler))
   dataloaders = [train_dataloader]
 
-  for d_i in xrange(config.num_dataloaders):
-    print("Creating auxiliary dataloader ind %d out of %d time %s" %
-          (d_i, config.num_dataloaders, datetime.now()))
+  for d_i in range(config.num_dataloaders):
+    print(("Creating auxiliary dataloader ind %d out of %d time %s" %
+          (d_i, config.num_dataloaders, datetime.now())))
     sys.stdout.flush()
 
     train_tf_imgs_list = []
@@ -332,8 +332,8 @@ def _create_dataloaders(config, dataset_class, tf1, tf2,
     dataloaders.append(train_tf_dataloader)
 
   num_train_batches = len(dataloaders[0])
-  print("Length of datasets vector %d" % len(dataloaders))
-  print("Number of batches per epoch: %d" % num_train_batches)
+  print(("Length of datasets vector %d" % len(dataloaders)))
+  print(("Number of batches per epoch: %d" % num_train_batches))
   sys.stdout.flush()
 
   return dataloaders
@@ -366,9 +366,9 @@ def _create_mapping_loader(config, dataset_class, tf3, partitions,
         target_transform=target_transform)
 
     if truncate:
-      print("shrinking dataset from %d" % len(imgs_curr))
+      print(("shrinking dataset from %d" % len(imgs_curr)))
       imgs_curr = TruncatedDataset(imgs_curr, pc=truncate_pc)
-      print("... to %d" % len(imgs_curr))
+      print(("... to %d" % len(imgs_curr)))
 
     if tencrop:
       imgs_curr = TenCropAndFinish(imgs_curr, input_sz=config.input_sz,

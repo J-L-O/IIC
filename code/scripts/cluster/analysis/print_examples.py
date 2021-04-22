@@ -23,7 +23,7 @@ given_config.out_dir = os.path.join(given_config.out_root,
                                     str(given_config.model_ind))
 
 reloaded_config_path = os.path.join(given_config.out_dir, "config.pickle")
-print("Loading restarting config from: %s" % reloaded_config_path)
+print(("Loading restarting config from: %s" % reloaded_config_path))
 with open(reloaded_config_path, "rb") as config_f:
   config = pickle.load(config_f)
 assert (config.model_ind == given_config.model_ind)
@@ -65,12 +65,12 @@ stats_dict = config.epoch_stats[best_i]
 print(stats_dict)
 if "best_train_sub_head" in stats_dict:
   best_head = stats_dict["best_train_sub_head"]
-  print("best_train_sub_head: %d" % best_head)
+  print(("best_train_sub_head: %d" % best_head))
   best_match = stats_dict["best_train_sub_head_match"]  # pred -> target
 
 if "best_head" in stats_dict:
   best_head = stats_dict["best_head"]
-  print("best_head: %d" % best_head)
+  print(("best_head: %d" % best_head))
   best_match = stats_dict["best_head_match"]
 
 assert (not ("best_train_sub_head" in stats_dict and "best_head" in stats_dict))
@@ -87,7 +87,7 @@ results_f = os.path.join(render_out_dir, "results.txt")
 
 iterators = (d for d in [dataloader, render_dataloader])
 
-for tup in itertools.izip(*iterators):
+for tup in zip(*iterators):
   train_batch = tup[0]
   render_batch = tup[1]
 
@@ -115,9 +115,9 @@ for tup in itertools.izip(*iterators):
       img = img.transpose((1, 2, 0))  # channels last
       img *= 255.
 
-      print(img.shape)
-      print(img.max())
-      print(img.min())
+      print((img.shape))
+      print((img.max()))
+      print((img.min()))
 
       img = Image.fromarray(img.astype(np.uint8))
       img.save(os.path.join(render_out_dir, "%d.png" % i))
@@ -130,4 +130,4 @@ for tup in itertools.izip(*iterators):
 
   break
 
-print("finished rendering to: %s" % render_out_dir)
+print(("finished rendering to: %s" % render_out_dir))

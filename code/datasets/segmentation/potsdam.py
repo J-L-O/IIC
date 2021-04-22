@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import os
 import os.path as osp
@@ -430,7 +430,7 @@ class Potsdam(_Potsdam):
     if self.use_coarse_labels:
       new_label_map = np.zeros(label.shape, dtype=label.dtype)
 
-      for c in xrange(6):
+      for c in range(6):
         new_label_map[label == c] = self._fine_to_coarse_dict[c]
 
       return new_label_map

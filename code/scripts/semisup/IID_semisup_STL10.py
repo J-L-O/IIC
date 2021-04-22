@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import argparse
 import os
@@ -224,7 +224,7 @@ def main():
 
   # Train ----------------------------------------------------------------------
 
-  for e_i in xrange(start_epoch, config.num_epochs):
+  for e_i in range(start_epoch, config.num_epochs):
     net.train()
 
     if e_i in config.lr_schedule:

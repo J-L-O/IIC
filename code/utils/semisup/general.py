@@ -83,8 +83,8 @@ def assess_acc_block(net, test_loader, gt_k=None, include_rgb=None,
   assert (preds.min() >= 0 and preds.max() < gt_k)
   assert (all_targets.min() >= 0 and all_targets.max() < gt_k)
   if not (preds.shape == all_targets.shape):
-    print(preds.shape)
-    print(all_targets.shape)
+    print((preds.shape))
+    print((all_targets.shape))
     assert (False)
 
   assert (preds.shape == (num_orig,))

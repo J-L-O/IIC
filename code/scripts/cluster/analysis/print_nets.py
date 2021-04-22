@@ -20,7 +20,7 @@ given_config.out_dir = os.path.join(given_config.out_root,
                                     str(given_config.model_ind))
 
 reloaded_config_path = os.path.join(given_config.out_dir, "config.pickle")
-print("Loading restarting config from: %s" % reloaded_config_path)
+print(("Loading restarting config from: %s" % reloaded_config_path))
 with open(reloaded_config_path, "rb") as config_f:
   config = pickle.load(config_f)
 assert (config.model_ind == given_config.model_ind)
