@@ -122,7 +122,7 @@ config = parser.parse_args()
 # Setup ------------------------------------------------------------------------
 
 config.out_dir = os.path.join(config.out_root, str(config.model_ind))
-config.dataloader_batch_sz = int(config.batch_sz / config.num_dataloaders)
+config.dataloader_batch_sz = config.batch_sz // config.num_dataloaders
 assert (config.mode == "IID")
 assert ("TwoHead" in config.arch)
 assert (config.output_k_B == config.gt_k)

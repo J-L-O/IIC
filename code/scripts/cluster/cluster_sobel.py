@@ -93,7 +93,7 @@ else:
     config.in_channels = 5
 
 config.out_dir = os.path.join(config.out_root, str(config.model_ind))
-config.dataloader_batch_sz = int(config.batch_sz / config.num_dataloaders)
+config.dataloader_batch_sz = config.batch_sz // config.num_dataloaders
 
 assert (config.mode == "IID+")
 assert (config.output_k >= config.gt_k)
