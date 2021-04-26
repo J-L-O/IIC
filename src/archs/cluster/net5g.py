@@ -18,25 +18,41 @@ class ClusterNet5gTrunk(ResNetTrunk):
 
         in_channels = config.in_channels
         self.inplanes = 64
-        self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=3, stride=1,
-                               padding=1,
-                               bias=False)
-        self.bn1 = nn.BatchNorm2d(64, track_running_stats=self.batchnorm_track)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        if config.input_sz == 96:
-            avg_pool_sz = 7
-        elif config.input_sz == 64:
-            avg_pool_sz = 5
-        elif config.input_sz == 32:
-            avg_pool_sz = 3
-        print(("avg_pool_sz %d" % avg_pool_sz))
 
-        self.avgpool = nn.AvgPool2d(avg_pool_sz, stride=1)
+        if config.input_sz == 224:
+            self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2,
+                                   padding=3,
+                                   bias=False)
+            self.bn1 = nn.BatchNorm2d(64, track_running_stats=self.batchnorm_track)
+            self.relu = nn.ReLU(inplace=True)
+            self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            self.layer1 = self._make_layer(block, 64, layers[0])
+            self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+
+            self.avgpool = nn.AdaptiveAvgPool2d(1)
+        else:
+            self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=3, stride=1,
+                                   padding=1,
+                                   bias=False)
+            self.bn1 = nn.BatchNorm2d(64, track_running_stats=self.batchnorm_track)
+            self.relu = nn.ReLU(inplace=True)
+            self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2, padding=1)
+            self.layer1 = self._make_layer(block, 64, layers[0])
+            self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+
+            if config.input_sz == 96:
+                avg_pool_sz = 7
+            elif config.input_sz == 64:
+                avg_pool_sz = 5
+            elif config.input_sz == 32:
+                avg_pool_sz = 3
+            print(("avg_pool_sz %d" % avg_pool_sz))
+
+            self.avgpool = nn.AvgPool2d(avg_pool_sz, stride=1)
 
     def forward(self, x, penultimate_features=False):
         x = self.conv1(x)
