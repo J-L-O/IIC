@@ -7,6 +7,7 @@ from datetime import datetime
 import matplotlib
 import numpy as np
 import torch
+from torch.utils.tensorboard import SummaryWriter
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -23,6 +24,12 @@ from src.utils.cluster.IID_losses import IID_loss
   Train and test script (coloured datasets).
   Network has two heads, for overclustering and final clustering.
 """
+
+if os.name == 'nt':
+    import win32file
+
+    print(f'Windows detected. Default max file count is {win32file._getmaxstdio()}.')
+    win32file._setmaxstdio(2048)
 
 # Options ----------------------------------------------------------------------
 
@@ -50,7 +57,9 @@ parser.add_argument("--num_dataloaders", type=int, default=3)
 parser.add_argument("--num_sub_heads", type=int, default=5)  # per head...
 
 parser.add_argument("--out_root", type=str,
-                    default="/scratch/shared/slow/xuji/iid_private")
+                    default="./results")
+parser.add_argument("--tb_root", type=str,
+                    default="./tfboard")
 parser.add_argument("--restart", dest="restart", default=False,
                     action="store_true")
 parser.add_argument("--restart_from_best", dest="restart_from_best",
@@ -128,6 +137,8 @@ config.eval_mode = "hung"
 
 if not os.path.exists(config.out_dir):
     os.makedirs(config.out_dir)
+
+writer = SummaryWriter(log_dir=config.tb_root)
 
 if config.restart:
     config_name = "config.pickle"
@@ -248,8 +259,8 @@ else:
     sys.stdout.flush()
     next_epoch = 1
 
-fig, axarr = plt.subplots(6 + 2 * int(config.double_eval), sharex=False,
-                          figsize=(20, 20))
+# fig, axarr = plt.subplots(6 + 2 * int(config.double_eval), sharex=False,
+#                           figsize=(20, 20))
 
 # Train ------------------------------------------------------------------------
 
@@ -277,10 +288,17 @@ for e_i in range(next_epoch, config.num_epochs):
         for head_i_epoch in range(head_epochs[head]):
             sys.stdout.flush()
 
-            iterators = (d for d in dataloaders)
+            iterators = [d for d in dataloaders]
 
             b_i = 0
             for tup in zip(*iterators):
+                # tup = ()
+                # for t in tup_batch:
+                #     images = t[0].clone()
+                #     labels = t[1].clone()
+                #     tup = tup + ([images, labels])
+                # del tup_batch
+
                 net.module.zero_grad()
 
                 # one less because this is before sobel
@@ -380,44 +398,48 @@ for e_i in range(next_epoch, config.num_epochs):
         print("     double eval: \n %s" % (nice(config.double_eval_stats[-1])))
     sys.stdout.flush()
 
-    axarr[0].clear()
-    axarr[0].plot(config.epoch_acc)
-    axarr[0].set_title("acc (best), top: %f" % max(config.epoch_acc))
+    writer.add_scalar('Evaluate/ACC', config.epoch_acc[-1], e_i)
+    # writer.add_scalar('Evaluate/NMI', nmi, epoch)
+    # writer.add_scalar('Evaluate/ARI', ari, epoch)
 
-    axarr[1].clear()
-    axarr[1].plot(config.epoch_avg_subhead_acc)
-    axarr[1].set_title("acc (avg), top: %f" % max(config.epoch_avg_subhead_acc))
+    # axarr[0].clear()
+    # axarr[0].plot(config.epoch_acc)
+    # axarr[0].set_title("acc (best), top: %f" % max(config.epoch_acc))
 
-    axarr[2].clear()
-    axarr[2].plot(config.epoch_loss_head_A)
-    axarr[2].set_title("Loss head A")
+    # axarr[1].clear()
+    # axarr[1].plot(config.epoch_avg_subhead_acc)
+    # axarr[1].set_title("acc (avg), top: %f" % max(config.epoch_avg_subhead_acc))
 
-    axarr[3].clear()
-    axarr[3].plot(config.epoch_loss_no_lamb_head_A)
-    axarr[3].set_title("Loss no lamb head A")
+    # axarr[2].clear()
+    # axarr[2].plot(config.epoch_loss_head_A)
+    # axarr[2].set_title("Loss head A")
 
-    axarr[4].clear()
-    axarr[4].plot(config.epoch_loss_head_B)
-    axarr[4].set_title("Loss head B")
+    # axarr[3].clear()
+    # axarr[3].plot(config.epoch_loss_no_lamb_head_A)
+    # axarr[3].set_title("Loss no lamb head A")
 
-    axarr[5].clear()
-    axarr[5].plot(config.epoch_loss_no_lamb_head_B)
-    axarr[5].set_title("Loss no lamb head B")
+    # axarr[4].clear()
+    # axarr[4].plot(config.epoch_loss_head_B)
+    # axarr[4].set_title("Loss head B")
 
-    if config.double_eval:
-        axarr[6].clear()
-        axarr[6].plot(config.double_eval_acc)
-        axarr[6].set_title("double eval acc (best), top: %f" %
-                           max(config.double_eval_acc))
+    # axarr[5].clear()
+    # axarr[5].plot(config.epoch_loss_no_lamb_head_B)
+    # axarr[5].set_title("Loss no lamb head B")
 
-        axarr[7].clear()
-        axarr[7].plot(config.double_eval_avg_subhead_acc)
-        axarr[7].set_title("double eval acc (avg), top: %f" %
-                           max(config.double_eval_avg_subhead_acc))
+    # if config.double_eval:
+    #     axarr[6].clear()
+    #     axarr[6].plot(config.double_eval_acc)
+    #     axarr[6].set_title("double eval acc (best), top: %f" %
+    #                        max(config.double_eval_acc))
 
-    fig.tight_layout()
-    fig.canvas.draw_idle()
-    fig.savefig(os.path.join(config.out_dir, "plots.png"))
+    #     axarr[7].clear()
+    #     axarr[7].plot(config.double_eval_avg_subhead_acc)
+    #     axarr[7].set_title("double eval acc (avg), top: %f" %
+    #                        max(config.double_eval_avg_subhead_acc))
+
+    # fig.tight_layout()
+    # fig.canvas.draw_idle()
+    # fig.savefig(os.path.join(config.out_dir, "plots.png"))
 
     if is_best or (e_i % config.save_freq == 0):
         net.module.cpu()
