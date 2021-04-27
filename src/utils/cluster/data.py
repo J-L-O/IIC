@@ -517,6 +517,11 @@ def create_basic_clustering_dataloaders(config):
     train_data_path = os.path.join(config.dataset_root, "train")
     test_val_data_path = os.path.join(config.dataset_root, "test")
     test_data_path = os.path.join(config.dataset_root, "test")
+
+    config.train_partitions_head_A = ["train", "test"]
+    config.train_partitions_head_B = ["train", "test"]
+    config.mapping_assignment_partitions = ["train", "test"]
+    config.mapping_test_partitions = ["train", "test"]
     assert (config.batchnorm_track)  # recommended (for test time invariance to batch size)
 
     # Transforms:
@@ -527,7 +532,7 @@ def create_basic_clustering_dataloaders(config):
 
     # Training data:
     # main output head (B), auxiliary overclustering head (A), same data for both
-    dataset_head_B = torchvision.datasets.ImageFolder(root=train_data_path, transform=tf1),
+    dataset_head_B = torchvision.datasets.ImageFolder(root=train_data_path, transform=tf1)
     datasets_tf_head_B = [torchvision.datasets.ImageFolder(root=train_data_path, transform=tf2)
                           for _ in range(config.num_dataloaders)]
     dataloaders_head_B = [torch.utils.data.DataLoader(
