@@ -9,10 +9,12 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import src.archs as archs
+from src import archs
 from src.utils.cluster.general import config_to_str, get_opt, update_lr, nice
 from src.utils.cluster.transforms import sobel_process
 from src.utils.cluster.cluster_eval import cluster_eval, get_subhead_using_loss
@@ -229,11 +231,15 @@ if config.restart:
                                        :(next_epoch - 1)]
 else:
     config.epoch_acc = []
+    config.epoch_ari = []
+    config.epoch_nmi = []
     config.epoch_avg_subhead_acc = []
     config.epoch_stats = []
 
     if config.double_eval:
         config.double_eval_acc = []
+        config.double_eval_ari = []
+        config.double_eval_nmi = []
         config.double_eval_avg_subhead_acc = []
         config.double_eval_stats = []
 
@@ -399,8 +405,8 @@ for e_i in range(next_epoch, config.num_epochs):
     sys.stdout.flush()
 
     writer.add_scalar('Evaluate/ACC', config.epoch_acc[-1], e_i)
-    # writer.add_scalar('Evaluate/NMI', nmi, epoch)
-    # writer.add_scalar('Evaluate/ARI', ari, epoch)
+    writer.add_scalar('Evaluate/ARI', config.epoch_ari[-1], e_i)
+    writer.add_scalar('Evaluate/NMI', config.epoch_nmi[-1], e_i)
 
     # axarr[0].clear()
     # axarr[0].plot(config.epoch_acc)

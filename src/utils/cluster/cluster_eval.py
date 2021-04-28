@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from .IID_losses import IID_loss
-from .eval_metrics import _hungarian_match, _original_match, _acc
+from .eval_metrics import _hungarian_match, _original_match, _acc, _ari, _nmi
 from .transforms import sobel_process
 
 
@@ -95,13 +95,13 @@ def cluster_subheads_eval(config, net,
     has negligible impact on accuracy metric for our models.
     """
 
-    all_matches, train_accs = _get_assignment_data_matches(net,
-                                                           mapping_assignment_dataloader,
-                                                           config,
-                                                           sobel=sobel,
-                                                           using_IR=using_IR,
-                                                           get_data_fn=get_data_fn,
-                                                           verbose=verbose)
+    all_matches, train_accs, train_aris, train_nmis = _get_assignment_data_matches(net,
+                                                                                   mapping_assignment_dataloader,
+                                                                                   config,
+                                                                                   sobel=sobel,
+                                                                                   using_IR=using_IR,
+                                                                                   get_data_fn=get_data_fn,
+                                                                                   verbose=verbose)
 
     best_sub_head_eval = np.argmax(train_accs)
     if (config.num_sub_heads > 1) and (use_sub_head is not None):
@@ -113,6 +113,8 @@ def cluster_subheads_eval(config, net,
         assert (
                 config.mapping_assignment_partitions == config.mapping_test_partitions)
         test_accs = train_accs
+        test_aris = train_aris
+        test_nmis = train_nmis
     elif config.mode == "IID+":
         flat_predss_all, flat_targets_all, = \
             get_data_fn(config, net, mapping_test_dataloader, sobel=sobel,
@@ -121,22 +123,31 @@ def cluster_subheads_eval(config, net,
 
         num_samples = flat_targets_all.shape[0]
         test_accs = np.zeros(config.num_sub_heads, dtype=np.float32)
+        test_aris = np.zeros(config.num_sub_heads, dtype=np.float32)
+        test_nmis = np.zeros(config.num_sub_heads, dtype=np.float32)
+
         for i in range(config.num_sub_heads):
             reordered_preds = torch.zeros(num_samples,
                                           dtype=flat_predss_all[0].dtype).cuda()
             for pred_i, target_i in all_matches[i]:
                 reordered_preds[flat_predss_all[i] == pred_i] = target_i
             test_acc = _acc(reordered_preds, flat_targets_all, config.gt_k, verbose=0)
+            test_ari = _ari(reordered_preds.cpu(), flat_targets_all.cpu())
+            test_nmi = _nmi(reordered_preds.cpu(), flat_targets_all.cpu())
 
             test_accs[i] = test_acc
+            test_aris[i] = test_ari
+            test_nmis[i] = test_nmi
     else:
         assert (False)
 
     return {"test_accs": list(test_accs),
-            "avg": np.mean(test_accs),
-            "std": np.std(test_accs),
-            "best": test_accs[best_sub_head],
-            "worst": test_accs.min(),
+            "acc_avg": np.mean(test_accs),
+            "acc_std": np.std(test_accs),
+            "acc_best": test_accs[best_sub_head],
+            "ari_best": test_aris[best_sub_head],
+            "nmi_best": test_nmis[best_sub_head],
+            "acc_worst": test_accs.min(),
             "best_train_sub_head": best_sub_head,  # from training data
             "best_train_sub_head_match": all_matches[best_sub_head],
             "train_accs": list(train_accs)}
@@ -180,6 +191,8 @@ def _get_assignment_data_matches(net, mapping_assignment_dataloader, config,
     all_matches = []
     if not just_matches:
         all_accs = np.zeros(config.num_sub_heads, dtype=np.float32)
+        all_aris = np.zeros(config.num_sub_heads, dtype=np.float32)
+        all_nmis = np.zeros(config.num_sub_heads, dtype=np.float32)
 
     for i in range(config.num_sub_heads):
         if verbose:
@@ -221,13 +234,18 @@ def _get_assignment_data_matches(net, mapping_assignment_dataloader, config,
                 print("reordered %s" % (datetime.now()))
                 sys.stdout.flush()
 
-            acc = _acc(reordered_preds, flat_targets_all, config.gt_k, verbose)
+            acc = _acc(reordered_preds, flat_targets_all, config.gt_k, verbose=0)
+            ari = _ari(reordered_preds.cpu(), flat_targets_all.cpu())
+            nmi = _nmi(reordered_preds.cpu(), flat_targets_all.cpu())
+
             all_accs[i] = acc
+            all_aris[i] = ari
+            all_nmis[i] = nmi
 
     if just_matches:
         return all_matches
     else:
-        return all_matches, all_accs
+        return all_matches, all_accs, all_aris, all_nmis
 
 
 def get_subhead_using_loss(config, dataloaders_head_B, net, sobel, lamb,
@@ -333,9 +351,15 @@ def cluster_eval(config, net, mapping_assignment_dataloader,
             print("double eval stats:")
             print(stats_dict2)
         else:
+            acc = stats_dict2["acc_best"]
+            ari = stats_dict2["ari_best"]
+            nmi = stats_dict2["nmi_best"]
+
             config.double_eval_stats.append(stats_dict2)
-            config.double_eval_acc.append(stats_dict2["best"])
-            config.double_eval_avg_subhead_acc.append(stats_dict2["avg"])
+            config.double_eval_acc.append(acc)
+            config.double_eval_ari.append(ari)
+            config.double_eval_nmi.append(nmi)
+            config.double_eval_avg_subhead_acc.append(stats_dict2["acc_avg"])
 
     net.eval()
     stats_dict = cluster_subheads_eval(config, net,
@@ -349,11 +373,15 @@ def cluster_eval(config, net, mapping_assignment_dataloader,
         print("eval stats:")
         print(stats_dict)
     else:
-        acc = stats_dict["best"]
+        acc = stats_dict["acc_best"]
+        ari = stats_dict["ari_best"]
+        nmi = stats_dict["nmi_best"]
         is_best = (len(config.epoch_acc) > 0) and (acc > max(config.epoch_acc))
 
         config.epoch_stats.append(stats_dict)
         config.epoch_acc.append(acc)
-        config.epoch_avg_subhead_acc.append(stats_dict["avg"])
+        config.epoch_ari.append(ari)
+        config.epoch_nmi.append(nmi)
+        config.epoch_avg_subhead_acc.append(stats_dict["acc_avg"])
 
         return is_best
