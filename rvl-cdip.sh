@@ -1,3 +1,5 @@
+#! /bin/bash
+
 python ./src/scripts/cluster/cluster_sobel_twohead.py \
 --model_ind 42 \
 --arch ClusterResNet50TwoHead \
