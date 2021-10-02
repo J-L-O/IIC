@@ -1,6 +1,6 @@
 #! /bin/bash
 
-python ./src/scripts/cluster/cluster_sobel_twohead.py \
+python -m src.scripts.cluster.cluster_sobel_twohead \
 --model_ind 42 \
 --arch ClusterResNet50TwoHead \
 --mode IID \
