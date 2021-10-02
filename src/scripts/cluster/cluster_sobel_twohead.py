@@ -323,10 +323,8 @@ for e_i in range(next_epoch, config.num_epochs):
 
                     actual_batch_start = d_i * curr_batch_sz
                     actual_batch_end = actual_batch_start + curr_batch_sz
-                    all_imgs[actual_batch_start:actual_batch_end, :, :, :] = \
-                        imgs_curr.cuda()
-                    all_imgs_tf[actual_batch_start:actual_batch_end, :, :, :] = \
-                        imgs_tf_curr.cuda()
+                    all_imgs[actual_batch_start:actual_batch_end, :, :, :] = imgs_curr.cuda()
+                    all_imgs_tf[actual_batch_start:actual_batch_end, :, :, :] = imgs_tf_curr.cuda()
 
                 if not (curr_batch_sz == config.dataloader_batch_sz):
                     print("last batch sz %d" % curr_batch_sz)

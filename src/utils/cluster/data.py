@@ -540,14 +540,14 @@ def create_basic_clustering_dataloaders(config):
         batch_size=config.dataloader_batch_sz,
         shuffle=False,
         sampler=DeterministicRandomSampler(dataset_head_B),
-        num_workers=0,
+        num_workers=2,
         drop_last=False)] + \
                          [torch.utils.data.DataLoader(
                              datasets_tf_head_B[i],
                              batch_size=config.dataloader_batch_sz,
                              shuffle=False,
                              sampler=DeterministicRandomSampler(datasets_tf_head_B[i]),
-                             num_workers=0,
+                             num_workers=2,
                              drop_last=False) for i in range(config.num_dataloaders)]
 
     dataset_head_A = torchvision.datasets.ImageFolder(root=train_data_path, transform=tf1)
@@ -558,14 +558,14 @@ def create_basic_clustering_dataloaders(config):
         batch_size=config.dataloader_batch_sz,
         shuffle=False,
         sampler=DeterministicRandomSampler(dataset_head_A),
-        num_workers=0,
+        num_workers=2,
         drop_last=False)] + \
                          [torch.utils.data.DataLoader(
                              datasets_tf_head_A[i],
                              batch_size=config.dataloader_batch_sz,
                              shuffle=False,
                              sampler=DeterministicRandomSampler(datasets_tf_head_A[i]),
-                             num_workers=0,
+                             num_workers=2,
                              drop_last=False) for i in range(config.num_dataloaders)]
 
     # Testing data (labelled):
@@ -577,7 +577,7 @@ def create_basic_clustering_dataloaders(config):
             batch_size=config.batch_sz,
             shuffle=False,
             sampler=DeterministicRandomSampler(mapping_assignment_dataset),
-            num_workers=0,
+            num_workers=2,
             drop_last=False)
 
         mapping_test_dataset = torchvision.datasets.ImageFolder(test_data_path, transform=tf3)
@@ -586,7 +586,7 @@ def create_basic_clustering_dataloaders(config):
             batch_size=config.batch_sz,
             shuffle=False,
             sampler=DeterministicRandomSampler(mapping_test_dataset),
-            num_workers=0,
+            num_workers=2,
             drop_last=False)
 
     return dataloaders_head_A, dataloaders_head_B, \
