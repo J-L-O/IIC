@@ -6,5 +6,7 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 RUN ["pip", "install", "-r", "./requirements.txt"]
 RUN ["chmod", "+x", "./hdi_balanced.sh"]
 RUN ["chmod", "+x", "./hdi_imbalanced.sh"]
+RUN ["chmod", "+x", "./hdi_balanced_restart.sh"]
+RUN ["chmod", "+x", "./hdi_imbalanced_restart.sh"]
 RUN ["chmod", "+x", "./tobacco3482.sh"]
 RUN ["chmod", "+x", "./rvl-cdip.sh"]
