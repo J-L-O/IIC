@@ -21,5 +21,5 @@ python -m src.scripts.cluster.cluster_sobel_twohead \
 --input_sz 224 \
 --head_A_first \
 --double_eval \
---batchnorm_track
+--batchnorm_track \
 --restart
